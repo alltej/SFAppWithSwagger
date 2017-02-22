@@ -1,5 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Web.Http;
+using Microsoft.ServiceFabric.Services.Remoting.Client;
+using SFApp.Domain;
 
 namespace ApiGateway.Controllers
 {
@@ -7,6 +10,13 @@ namespace ApiGateway.Controllers
     [ServiceRequestActionFilter]
     public class ValuesController : ApiController
     {
+        private IServiceProxyFactory _svcProxyFactory;
+
+        public ValuesController()
+        {
+            _svcProxyFactory = new ServiceProxyFactory();
+
+        }
         // GET api/values 
         [HttpGet]
         [Route("")]
@@ -45,6 +55,20 @@ namespace ApiGateway.Controllers
         public IHttpActionResult Delete(int id)
         {
             return Ok($"DELETE id: {id}");
+        }
+
+        /// <summary>
+        /// Get list of cities
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("cities")]
+        public async Task<IHttpActionResult> GetListOfCities()
+        {
+            var client = _svcProxyFactory.GetMyStatelessService();
+
+            var result = await client.GetListOfCities();
+            return Ok(result);
         }
     }
 }

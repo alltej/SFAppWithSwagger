@@ -3,3 +3,6 @@
 ################################################################################
 
 /ApiGateway/obj/x64/Debug
+/MyStatelessService/obj/x64/Debug
+/packages
+/SFApp.Domain/obj/Debug

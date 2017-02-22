@@ -5,14 +5,16 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
+using Microsoft.ServiceFabric.Services.Remoting.FabricTransport.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
+using SFApp.Domain.Services;
 
 namespace MyStatelessService
 {
     /// <summary>
     /// An instance of this class is created for each service instance by the Service Fabric runtime.
     /// </summary>
-    internal sealed class MyStatelessService : StatelessService
+    internal sealed class MyStatelessService : StatelessService, IMyStatelessService
     {
         public MyStatelessService(StatelessServiceContext context)
             : base(context)
@@ -24,7 +26,7 @@ namespace MyStatelessService
         /// <returns>A collection of listeners.</returns>
         protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
         {
-            return new ServiceInstanceListener[0];
+            yield return new ServiceInstanceListener(context => new FabricTransportServiceRemotingListener(context, this), "StatelessFabricTransportServiceRemotingListener");
         }
 
         /// <summary>
@@ -46,6 +48,17 @@ namespace MyStatelessService
 
                 await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
             }
+        }
+
+        public async Task<List<string>> GetListOfCities()
+        {
+            var list = new List<string>
+            {
+                "Chicago",
+                "Atlanta",
+                "New York"
+            };
+            return await Task.FromResult(list);
         }
     }
 }
